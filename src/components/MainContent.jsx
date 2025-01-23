@@ -1,49 +1,53 @@
-import axios from 'axios';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  fetchProducts,
+  selectProducts,
+  selectIsLoading,
+  selectError,
+} from '../redux/userSlice';
 import Card from './Card';
-import { Link } from 'react-router-dom';
 
 const MainContent = () => {
-  const [items, setItems] = useState([]);
+  const dispatch = useDispatch();
+  const items = useSelector(selectProducts);
+  const isLoading = useSelector(selectIsLoading);
+  const error = useSelector(selectError);
+
   const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1); // Текущая страница
+  const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(8);
   const [debounce, setDebounce] = useState('');
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
-
-  const paginate = (pageNumber) => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setCurrentPage(pageNumber);
-  };
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setDebounce(searchQuery);
+      setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await axios.get('https://dummyjson.com/products');
-        setItems(res.data.products);
-      } catch (error) {
-        console.log(error);
-      }
-    };
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-    fetchData();
-  }, []);
+  const filteredItems = items.filter((product) =>
+    product.title.toLowerCase().includes(debounce.toLowerCase())
+  );
 
-  const filteredItems = items.filter((product) => {
-    return product.title.toLowerCase().includes(debounce.toLowerCase());
-  });
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+
+  const paginate = (pageNumber) => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setCurrentPage(pageNumber);
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
     <div className="h-5/6 flex flex-col justify-center items-center gap-5 p-4 bg-base-100">
       <div className="flex justify-center w-full">
@@ -56,39 +60,24 @@ const MainContent = () => {
         />
       </div>
       <div className="container flex flex-wrap justify-center gap-5 p-5">
-        {searchQuery === '' ? (
-          currentItems.map((product) => {
-            return (
-              <Card
-                key={product.id}
-                id={product.id}
-                title={product.title}
-                descr={product.description}
-                price={product.price}
-                img={product.thumbnail}
-              />
-            );
-          })
-        ) : filteredItems.length === 0 ? (
-          <div>No product found.</div>
+        {currentItems.length > 0 ? (
+          currentItems.map((product) => (
+            <Card
+              key={product.id}
+              id={product.id}
+              title={product.title}
+              descr={product.description}
+              price={product.price}
+              img={product.thumbnail}
+            />
+          ))
         ) : (
-          filteredItems.map((product) => {
-            return (
-              <Link to={`/product/${product.id}`} key={product.id}>
-                <Card
-                  title={product.title}
-                  descr={product.description}
-                  price={product.price}
-                  img={product.thumbnail}
-                />
-              </Link>
-            );
-          })
+          <div>No product found.</div>
         )}
       </div>
       <Pagination
         itemsPerPage={itemsPerPage}
-        totalItems={items.length}
+        totalItems={filteredItems.length}
         paginate={paginate}
         currentPage={currentPage}
       />
@@ -112,8 +101,8 @@ const Pagination = ({ itemsPerPage, totalItems, paginate, currentPage }) => {
               onClick={() => paginate(number)}
               className={`px-4 py-2 rounded-md ${
                 currentPage === number
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 text-gray-800'
+                  ? 'bg-base-500 text-base-content'
+                  : 'bg-base-200 text-base-content'
               }`}
             >
               {number}

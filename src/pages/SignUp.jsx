@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch } from 'react-redux';
-import { setUserData } from '../redux/action';
+import { setUserData } from '../redux/userSlice';
 import { Link, useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
@@ -12,7 +12,8 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const submitHandler = () => {
+  const submitHandler = (e) => {
+    e.preventDefault();
     if (name === '' || email === '' || password === '')
       return toast.error('Please fill all the fields');
     if (!localStorage.getItem('products')) {
@@ -22,9 +23,9 @@ const SignUp = () => {
       setUserData({
         name: name,
         email: email,
-        isSignedUp: true,
         img: img,
         products: [],
+        isSignedUp: true,
       })
     );
 
@@ -129,7 +130,11 @@ const SignUp = () => {
               />
             </div>
             <div className="form-control mt-4">
-              <button className="btn btn-primary" onClick={submitHandler}>
+              <button
+                className="btn btn-primary"
+                type="submit"
+                onClick={submitHandler}
+              >
                 Sign Up
               </button>
             </div>

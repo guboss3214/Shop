@@ -1,15 +1,19 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { setUserData } from '../redux/action';
+import { setUserData } from '../redux/userSlice';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import { getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage';
+import {
+  getFromLocalStorage,
+  removeFromLocalStorage,
+  saveToLocalStorage,
+} from '../utils/localStorage';
 import { useEffect } from 'react';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const isSignedUp = localStorage.getItem('isSignedUp') === 'true';
   const img = localStorage.getItem('img');
-  const items = useSelector((state) => state.products);
+  const items = useSelector((state) => state.user.products);
   const total = items
     .map((price) => price.price)
     .reduce((a, b) => a + b, 0)
@@ -19,11 +23,12 @@ const Navbar = () => {
     dispatch(
       setUserData({
         isSignedUp: false,
+        products: [],
       })
     );
     toast.success('Successfully logged out!');
-    window.location.reload();
     localStorage.clear();
+    window.location.reload();
   };
 
   const handleDeleteItem = (id) => {
@@ -33,20 +38,19 @@ const Navbar = () => {
     toast.success('Item deleted successfully!');
   };
 
+  const handlePayClick = () => {
+    dispatch(setUserData({ products: [] }));
+    removeFromLocalStorage('products');
+    toast.success('Payment successful!');
+  };
+
   useEffect(() => {
     const products = getFromLocalStorage('products', []);
-    if (!localStorage.getItem('products')) {
-      saveToLocalStorage('products', products);
-    }
 
-    const isSignedUp = localStorage.getItem('isSignedUp') === 'true';
-    dispatch(
-      setUserData({
-        isSignedUp,
-        products,
-      })
-    );
-  }, [dispatch]);
+    if (products.length > 0) {
+      dispatch(setUserData({ isSignedUp, products }));
+    }
+  }, [dispatch, isSignedUp]);
 
   return (
     <div className="navbar bg-neutral text-neutral-content">
@@ -63,7 +67,7 @@ const Navbar = () => {
               role="button"
               className="btn btn-ghost btn-circle"
             >
-              <div className="indicator">
+              <div className="indicator hidden">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"
@@ -146,7 +150,12 @@ const Navbar = () => {
                           className="flex items-center gap-4"
                         >
                           <button className="btn">Close</button>
-                          <Link className="btn btn-primary">Pay</Link>
+                          <button
+                            className="btn btn-primary"
+                            onClick={handlePayClick}
+                          >
+                            Pay
+                          </button>
                         </form>
                       </div>
                     </div>

@@ -1,11 +1,11 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { setUserData } from '../redux/action';
-import { getFromLocalStorage, saveToLocalStorage } from '../utils/localStorage';
+import { setUserData } from '../redux/userSlice';
+import { addToCart } from '../utils/cartUtils';
 
 const Card = ({ id, title, descr, price, img }) => {
-  const cart = useSelector((state) => state.products);
   const dispatch = useDispatch();
+  const cart = useSelector((state) => state.user.products);
   const handleAddToCart = () => {
     const products = {
       id,
@@ -13,9 +13,7 @@ const Card = ({ id, title, descr, price, img }) => {
       price,
       img,
     };
-    const updatedCart = [...cart, products];
-    saveToLocalStorage('products', updatedCart);
-    dispatch(setUserData({ products: updatedCart }));
+    addToCart(products, cart, dispatch, setUserData);
   };
   return (
     <div className="card bg-neutral w-72 shadow-xl transition-all ease-in duration-200  hover:scale-105 text-neutral-content">

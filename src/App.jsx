@@ -1,12 +1,12 @@
 import { Toaster } from 'react-hot-toast';
-import SignUp from './components/SignUp';
+import SignUp from './pages/SignUp';
 import Navbar from './components/Navbar';
 import FooterComponent from './components/FooterComponent';
 import MainContent from './components/MainContent';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import ProductPage from './components/ProductPage';
-import Profile from './components/Profile';
-import Settings from './components/Settings';
+import ProductPage from './pages/ProductPage';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 
 const App = () => {
   return (

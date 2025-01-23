@@ -1,11 +1,27 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
+import { addToCart } from '../utils/cartUtils';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserData } from '../redux/userSlice';
 
 const ProductPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const isSignedUp = localStorage.getItem('isSignedUp') === 'true';
+  const dispatch = useDispatch();
+  const cart = useSelector((state) => state.user.products);
+
+  const handleClickCart = () => {
+    const productData = {
+      id,
+      title: product.title,
+      price: product.price,
+      img: product.thumbnail,
+    };
+    addToCart(productData, cart, dispatch, setUserData);
+  };
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -22,7 +38,7 @@ const ProductPage = () => {
   if (!product) return <div>Loading...</div>;
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center p-4">
+    <div className="h-screen bg-base-100 text-base-content flex flex-col justify-center items-center p-4">
       <div className="w-full flex items-start">
         <Link
           to="/"
@@ -43,7 +59,9 @@ const ProductPage = () => {
           <p className="text-xl font-semibold mt-2">${product.price}</p>
           <div className="mt-4">
             {isSignedUp ? (
-              <button className="btn btn-primary">Add to Cart</button>
+              <button className="btn btn-primary" onClick={handleClickCart}>
+                Add to Cart
+              </button>
             ) : (
               <Link to="/signup" className="btn btn-primary">
                 Sign Up to Add to Cart
