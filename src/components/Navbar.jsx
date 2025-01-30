@@ -1,19 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { setUserData } from '../redux/userSlice';
+import { clearCart, removeFromCart, setUserData } from '../redux/userSlice';
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
-import {
-  getFromLocalStorage,
-  removeFromLocalStorage,
-  saveToLocalStorage,
-} from '../utils/localStorage';
-import { useEffect } from 'react';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const isSignedUp = localStorage.getItem('isSignedUp') === 'true';
   const img = localStorage.getItem('img');
-  const items = useSelector((state) => state.user.products);
+  const items = useSelector((state) => state.user.cart);
   const total = items
     .map((price) => price.price)
     .reduce((a, b) => a + b, 0)
@@ -23,7 +17,7 @@ const Navbar = () => {
     dispatch(
       setUserData({
         isSignedUp: false,
-        products: [],
+        cart: [],
       })
     );
     toast.success('Successfully logged out!');
@@ -32,25 +26,14 @@ const Navbar = () => {
   };
 
   const handleDeleteItem = (id) => {
-    const updatedProducts = items.filter((item) => item.id !== id);
-    saveToLocalStorage('products', updatedProducts);
-    dispatch(setUserData({ products: updatedProducts }));
+    dispatch(removeFromCart(id));
     toast.success('Item deleted successfully!');
   };
 
   const handlePayClick = () => {
-    dispatch(setUserData({ products: [] }));
-    removeFromLocalStorage('products');
+    dispatch(clearCart({ cart: [] }));
     toast.success('Payment successful!');
   };
-
-  useEffect(() => {
-    const products = getFromLocalStorage('products', []);
-
-    if (products.length > 0) {
-      dispatch(setUserData({ isSignedUp, products }));
-    }
-  }, [dispatch, isSignedUp]);
 
   return (
     <div className="navbar bg-neutral text-neutral-content">
@@ -67,7 +50,7 @@ const Navbar = () => {
               role="button"
               className="btn btn-ghost btn-circle"
             >
-              <div className="indicator hidden">
+              <div className="indicator">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-5 w-5"

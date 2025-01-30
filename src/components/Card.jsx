@@ -1,25 +1,19 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { setUserData } from '../redux/userSlice';
-import { addToCart } from '../utils/cartUtils';
+import { addToCart } from '../redux/userSlice';
 
 const Card = ({ id, title, descr, price, img }) => {
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.user.products);
+
   const handleAddToCart = () => {
-    const products = {
-      id,
-      title,
-      price,
-      img,
-    };
-    addToCart(products, cart, dispatch, setUserData);
+    dispatch(addToCart({ id, title, price, img }));
   };
+
   return (
-    <div className="card bg-neutral w-72 shadow-xl transition-all ease-in duration-200  hover:scale-105 text-neutral-content">
+    <div className="card bg-neutral w-72 shadow-xl transition-all ease-in duration-200 hover:scale-105 text-neutral-content">
       <Link to={`/product/${id}`}>
         <figure>
-          <img src={img} alt="Shoes" />
+          <img src={img} alt={title} />
         </figure>
       </Link>
       <div className="card-body">

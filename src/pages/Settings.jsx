@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { THEMES } from '../constants';
+import toast from 'react-hot-toast';
 
 const Settings = () => {
   const [theme, setTheme] = useState();
@@ -7,6 +8,7 @@ const Settings = () => {
   useEffect(() => {
     if (theme) {
       document.documentElement.setAttribute('data-theme', theme);
+      toast.success(`${theme} theme added successfully!`);
     }
   }, [theme]);
 
@@ -19,7 +21,7 @@ const Settings = () => {
         <button
           key={t}
           className={`
-            group flex flex-col items-center gap-1.5 p-2 rounded-lg transition-colors
+            group flex flex-col items-center justify-center gap-1.5 p-2 rounded-lg transition-colors
             ${theme === t ? 'bg-base-200' : 'hover:bg-base-200/50'}
             bg-neutral-200 dark:bg-neutral-700 text-black dark:text-white
           `}

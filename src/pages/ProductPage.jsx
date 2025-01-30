@@ -1,25 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import { addToCart } from '../utils/cartUtils';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUserData } from '../redux/userSlice';
+import { addToCart } from '../redux/userSlice';
+import { useDispatch } from 'react-redux';
+import toast from 'react-hot-toast/headless';
 
 const ProductPage = () => {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
   const isSignedUp = localStorage.getItem('isSignedUp') === 'true';
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.user.products);
 
   const handleClickCart = () => {
+    toast.error('Item added to cart');
     const productData = {
       id,
       title: product.title,
       price: product.price,
       img: product.thumbnail,
     };
-    addToCart(productData, cart, dispatch, setUserData);
+    dispatch(addToCart(productData));
   };
 
   useEffect(() => {
@@ -31,7 +31,6 @@ const ProductPage = () => {
         console.error('Error fetching product:', error);
       }
     };
-
     fetchProduct();
   }, [id]);
 

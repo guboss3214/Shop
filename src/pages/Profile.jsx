@@ -19,7 +19,11 @@ const Profile = () => {
         <div className="flex justify-center">
           <div className="relative">
             <img
-              src={img}
+              src={
+                img
+                  ? img
+                  : 'https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp'
+              }
               alt="Avatar"
               className="rounded-full h-40 w-40 object-cover border-4 border-yellow-500 shadow-lg transition-transform duration-500 hover:rotate-6"
             />

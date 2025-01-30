@@ -12,13 +12,10 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const submitHandler = (e) => {
-    e.preventDefault();
+  const submitHandler = () => {
     if (name === '' || email === '' || password === '')
       return toast.error('Please fill all the fields');
-    if (!localStorage.getItem('products')) {
-      localStorage.setItem('products', JSON.stringify([]));
-    }
+    localStorage.removeItem('products');
     dispatch(
       setUserData({
         name: name,

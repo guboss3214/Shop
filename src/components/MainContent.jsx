@@ -9,7 +9,6 @@ import {
 import Card from './Card';
 
 const MainContent = () => {
-  const dispatch = useDispatch();
   const items = useSelector(selectProducts);
   const isLoading = useSelector(selectIsLoading);
   const error = useSelector(selectError);
@@ -18,19 +17,16 @@ const MainContent = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(8);
   const [debounce, setDebounce] = useState('');
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    dispatch(fetchProducts());
     const timeoutId = setTimeout(() => {
       setDebounce(searchQuery);
       setCurrentPage(1);
     }, 500);
-
     return () => clearTimeout(timeoutId);
-  }, [searchQuery]);
-
-  useEffect(() => {
-    dispatch(fetchProducts());
-  }, [dispatch]);
+  }, [searchQuery, dispatch]);
 
   const filteredItems = items.filter((product) =>
     product.title.toLowerCase().includes(debounce.toLowerCase())
