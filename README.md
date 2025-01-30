@@ -33,8 +33,8 @@ This is a simple e-commerce web application built using React and Redux Toolkit.
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/your-username/e-commerce-react-app.git
-   cd e-commerce-react-app
+   git clone https://github.com/guboss3214/Shop.git
+   cd Shop
    ```
 2. Install dependencies:
    ```sh
